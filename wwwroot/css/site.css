@@ -1,6 +1,33 @@
+:root {
+    --kb-dark-color: rgb(67, 8, 116);
+    --kb-light-color: rgb(161, 228, 122);
+    --kb-background-color: rgba(12, 117, 82, 0.8);
+    --kb-primary-color: rgb(145,203,251);
+    --kb-secondary-color: rgb(151, 30, 207);
+    --kb-highlight-color: rgb(107, 189, 40);
+    --kb-nav-toggler-glow: rgb(73, 211, 158);
+    --kb-white-color: rgb(255,255,255);
+    
+    
+    
+    --kb-title-font: 'Fira Sans', sans-serif;
+    --kb-sub-font: 'Racing Sans One', cursive;
+    --kb-body-font: 'Roboto', sans-serif;
+}
+
+nav {
+    background-color: var(--kb-primary-color);
+}
+    .navShadow{
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+
+
 html {
   font-size: 14px;
 }
+
 
 @media (min-width: 768px) {
   html {
@@ -13,6 +40,32 @@ html {
   min-height: 100%;
 }
 
+
 body {
   margin-bottom: 60px;
+}
+
+
+footer {
+    flex-shrink: 0;
+    background-color: var(--kb-primary-color);
+}
+
+/* Button OverRides!*/
+.btn-outline-primary {
+    color: var(--kb-background-color);
+    border-color: var(--kb-light-color) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:active,
+.btn-outline-primary:focus {
+    border-color: var(--kb-highlight-color);
+    background-color: var(--kb-secondary-color);
+}
+
+
+
+.btnLink{
+    width: 7rem;
 }
