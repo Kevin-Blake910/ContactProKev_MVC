@@ -20,6 +20,7 @@ namespace ContactProKev_MVC.Models
         public string? FullName { get { return $"{FirstName} {LastName}"; } }
 
         // TODO: Make relationship to Contact Model
+        public virtual ICollection<Contact> Contacts { get; set; } = new HashSet<Contact>();
         // TODO: Make relationship to Category Model
     }
 }
