@@ -3,6 +3,7 @@ using System;
 using ContactProKev_MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ContactProKev_MVC.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221025185933_NewModelContact_0003")]
+    partial class NewModelContact_0003
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +23,6 @@ namespace ContactProKev_MVC.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("CategoryContact", b =>
-                {
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ContactsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CategoriesId", "ContactsId");
-
-                    b.HasIndex("ContactsId");
-
-                    b.ToTable("CategoryContact");
-                });
 
             modelBuilder.Entity("ContactProKev_MVC.Models.AppUser", b =>
                 {
@@ -109,27 +96,6 @@ namespace ContactProKev_MVC.Data.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("ContactProKev_MVC.Models.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserID")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserID");
-
-                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("ContactProKev_MVC.Models.Contact", b =>
@@ -335,30 +301,6 @@ namespace ContactProKev_MVC.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CategoryContact", b =>
-                {
-                    b.HasOne("ContactProKev_MVC.Models.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ContactProKev_MVC.Models.Contact", null)
-                        .WithMany()
-                        .HasForeignKey("ContactsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ContactProKev_MVC.Models.Category", b =>
-                {
-                    b.HasOne("ContactProKev_MVC.Models.AppUser", "AppUser")
-                        .WithMany("Categories")
-                        .HasForeignKey("AppUserID");
-
-                    b.Navigation("AppUser");
-                });
-
             modelBuilder.Entity("ContactProKev_MVC.Models.Contact", b =>
                 {
                     b.HasOne("ContactProKev_MVC.Models.AppUser", "AppUser")
@@ -423,8 +365,6 @@ namespace ContactProKev_MVC.Data.Migrations
 
             modelBuilder.Entity("ContactProKev_MVC.Models.AppUser", b =>
                 {
-                    b.Navigation("Categories");
-
                     b.Navigation("Contacts");
                 });
 #pragma warning restore 612, 618

@@ -19,8 +19,11 @@ namespace ContactProKev_MVC.Models
         [NotMapped]
         public string? FullName { get { return $"{FirstName} {LastName}"; } }
 
+       
+        //Navigation Properties
         // TODO: Make relationship to Contact Model
         public virtual ICollection<Contact> Contacts { get; set; } = new HashSet<Contact>();
         // TODO: Make relationship to Category Model
+        public virtual ICollection<Category> Categories { get; set; } = new HashSet<Category>();
     }
 }

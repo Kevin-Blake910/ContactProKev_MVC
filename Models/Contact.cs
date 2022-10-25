@@ -70,7 +70,7 @@ namespace ContactProKev_MVC.Models
 
         public virtual AppUser? AppUser { get; set; }
 
-        //public virtual ICollection<Category> Categories { get; set; } = HashSet<Category>();
+        public virtual ICollection<Category> Categories { get; set; } = new HashSet<Category>();
 
     }    
 }
