@@ -10,12 +10,8 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="AppUserId" class="control-label"></label>
-                <select asp-for="AppUserId" class ="form-control" asp-items="ViewBag.AppUserId"></select>
-            </div>
+        <form asp-action="Create" asp-controller="Contacts" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>        
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
@@ -48,7 +44,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="State" class="control-label"></label>
-                <select asp-for="State" class="form-control"></select>
+                <select asp-for="State" class="form-control" asp-items="ViewBag.StatesList"></select>
                 <span asp-validation-for="State" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -65,23 +61,18 @@
                 <label asp-for="PhoneNumber" class="control-label"></label>
                 <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>      
+            @*TODO: ADD IMAGE INPUT*@
+            <div class="form-group">
+                <label class="control-label">Choose An Image</label>
+                <input asp-for="ImageFile" class="form-control" accept=".png,.jpg,.jpeg,.gif,.svg" 
+                onchange="document.getElementById('contactImage').src = window.URL.createObjectURL(this.files[0])"/>
             </div>
             <div class="form-group">
-                <label asp-for="Created" class="control-label"></label>
-                <input asp-for="Created" class="form-control" />
-                <span asp-validation-for="Created" class="text-danger"></span>
+                <img id="contactImage" class="img-fluid" src="~/"/>
             </div>
-            <div class="form-group">
-                <label asp-for="ImageData" class="control-label"></label>
-                <input asp-for="ImageData" class="form-control" />
-                <span asp-validation-for="ImageData" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageType" class="control-label"></label>
-                <input asp-for="ImageType" class="form-control" />
-                <span asp-validation-for="ImageType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+
+            <div class="form-group mt-2">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>

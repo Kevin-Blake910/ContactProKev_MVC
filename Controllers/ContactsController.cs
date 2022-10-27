@@ -9,6 +9,8 @@ using ContactProKev_MVC.Data;
 using ContactProKev_MVC.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using ContactProKev_MVC.Enums;
+using ContactProKev_MVC.Services.Interfaces;
 
 namespace ContactProKev_MVC.Controllers
 {
@@ -16,12 +18,15 @@ namespace ContactProKev_MVC.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IImageService _imageService;
 
         public ContactsController(ApplicationDbContext context, 
-            UserManager<AppUser> userManager)
+            UserManager<AppUser> userManager,
+            IImageService imageService)
         {
             _context = context;
             _userManager = userManager;
+            _imageService = imageService;
         }
 
         // GET: Contacts
@@ -30,7 +35,7 @@ namespace ContactProKev_MVC.Controllers
         {
             string userId = _userManager.GetUserId(User);
 
-            var contacts = await _context.Contacts
+            List<Contact> contacts = await _context.Contacts
                 .Where(c => c.AppUserId == userId)
                 .Include(c => c.AppUser)
                 .ToListAsync();
@@ -56,27 +61,50 @@ namespace ContactProKev_MVC.Controllers
             return View(contact);
         }
 
-        // GET: Contacts/Create
+        // GET: Contacts/Create --------------getting enum list**
+        [Authorize]
         public IActionResult Create()
         {
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
+            //TODO: Categories Drop Down
             return View();
         }
 
         // POST: Contacts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AppUserId,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,Created,ImageData,ImageType")] Contact contact)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,ImageFile")] Contact contact)
         {
+            ModelState.Remove("AppUserId");
+            
             if (ModelState.IsValid)
             {
+                contact.AppUserId = _userManager.GetUserId(User);
+                contact.Created = DateTime.UtcNow;
+
+                if(contact.BirthDate != null)
+                {
+                    contact.BirthDate = DateTime.SpecifyKind(contact.BirthDate.Value, DateTimeKind.Utc);
+                }
+
+                //Check whether a file/image has been selected
+                //if ImageFile is NOT null set the ImageData property - Convert file to byte[]
+                //if ImageFile is NOT null set the ImageType property - Use the file extension as the value
+                if (contact.ImageFile != null)
+                {
+                    contact.ImageData = await _imageService.ConvertFileToByteArrayAsync(contact.ImageFile);
+                    contact.ImageType = contact.ImageFile.ContentType;
+                }
+
                 _context.Add(contact);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", contact.AppUserId);
+            ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
+
             return View(contact);
         }
 

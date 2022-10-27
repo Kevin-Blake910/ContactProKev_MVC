@@ -1,4 +1,9 @@
 ﻿@model IEnumerable<ContactProKev_MVC.Models.Contact>
+@using ContactProKev_MVC.Services.Interfaces
+
+@inject IImageService ImageService
+
+
 
 @{
     ViewData["Title"] = "Index";
@@ -47,10 +52,7 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ImageData)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageType)
-            </th>
+            </th>            
             <th>
                 @Html.DisplayNameFor(model => model.AppUser)
             </th>
@@ -94,13 +96,10 @@
                 @Html.DisplayFor(modelItem => item.Created)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ImageData)
-            </td>
+                <img src="@ImageService.ConvertByteArrayToFile(item.ImageData!,item.ImageType!)" style="width:80%;height:80%" />
+            </td>         
             <td>
-                @Html.DisplayFor(modelItem => item.ImageType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AppUser.Id)
+                @Html.DisplayFor(modelItem => item.AppUser.FullName)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
