@@ -3,23 +3,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ContactProKev_MVC.Data;
 using ContactProKev_MVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace ContactProKev_MVC.Controllers
 {
     public class CategoriesController : Controller
+   
+
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-        public CategoriesController(ApplicationDbContext context)
+
+        public CategoriesController(ApplicationDbContext context,
+                                    UserManager<AppUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Categories
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Categories.Include(c => c.AppUser);
-            return View(await applicationDbContext.ToListAsync());
+            string userID = _userManager.GetUserId(User);
+
+            List<Category> categories = await _context.Categories
+                                                .Where(c => c.AppUserID == userID)
+                                                .Include(c => c.AppUser)
+                                                .ToListAsync();
+            return View(categories);
         }
 
         // GET: Categories/Details/5
@@ -42,26 +56,32 @@ namespace ContactProKev_MVC.Controllers
         }
 
         // GET: Categories/Create
+        [Authorize]
         public IActionResult Create()
         {
-            ViewData["AppUserID"] = new SelectList(_context.Users, "Id", "Id");
+           
             return View();
         }
 
         // POST: Categories/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AppUserID,Name")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
+            ModelState.Remove("AppUserId");
+
             if (ModelState.IsValid)
             {
+                string userId = _userManager.GetUserId(User);
+                category.AppUserID = userId;
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserID"] = new SelectList(_context.Users, "Id", "Id", category.AppUserID);
             return View(category);
         }
 
@@ -73,12 +93,13 @@ namespace ContactProKev_MVC.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
+            Category? category = await _context.Categories.FindAsync(id);
+
             if (category == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserID"] = new SelectList(_context.Users, "Id", "Id", category.AppUserID);
+
             return View(category);
         }
 
@@ -114,7 +135,6 @@ namespace ContactProKev_MVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserID"] = new SelectList(_context.Users, "Id", "Id", category.AppUserID);
             return View(category);
         }
 

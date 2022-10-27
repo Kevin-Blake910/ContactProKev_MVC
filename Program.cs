@@ -20,7 +20,7 @@ builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireCo
 
 // Custom Serviceswhat i have added
 builder.Services.AddScoped<IImageService, ImageService>();
-
+builder.Services.AddScoped<IAddressBookService, AddressBookService>();
 
 
 

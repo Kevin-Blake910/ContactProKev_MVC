@@ -24,25 +24,27 @@ nav {
 
 
 
-html {
-  font-size: 14px;
+html,
+body{
+    height: 100%;
 }
 
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
+    font-size: 14px;
 }
 
 
 body {
-  margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--kb-body-font);    
+    color: var(--kb-dark-color-);
+    background-color: var(--kb-background-color);
 }
 
 
@@ -60,12 +62,12 @@ footer {
     border-color: var(--kb-light-color) !important;
 }
 
-.btn-outline-primary:hover,
-.btn-outline-primary:active,
-.btn-outline-primary:focus {
-    border-color: var(--kb-highlight-color);
-    background-color: var(--kb-secondary-color);
-}
+    .btn-outline-primary:hover,
+    .btn-outline-primary:active,
+    .btn-outline-primary:focus {
+        color: var(--kb-light-color);
+        border-color: var(--kb-secondary-color) !important;
+    }
 
 
 

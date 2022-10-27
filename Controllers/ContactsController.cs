@@ -19,26 +19,29 @@ namespace ContactProKev_MVC.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly IImageService _imageService;
-
+        private readonly IAddressBookService _addressBookService;
         public ContactsController(ApplicationDbContext context, 
             UserManager<AppUser> userManager,
-            IImageService imageService)
+            IImageService imageService,
+            IAddressBookService addressBookService)
         {
             _context = context;
             _userManager = userManager;
             _imageService = imageService;
+            _addressBookService = addressBookService;
         }
 
-        // GET: Contacts
+        // GET: Contacts ----------------can do more then one include
         [Authorize]
         public async Task<IActionResult> Index()
         {
             string userId = _userManager.GetUserId(User);
 
             List<Contact> contacts = await _context.Contacts
-                .Where(c => c.AppUserId == userId)
-                .Include(c => c.AppUser)
-                .ToListAsync();
+                                                   .Where(c => c.AppUserId == userId)
+                                                   .Include(c => c.AppUser)
+                                                   .Include(c => c.Categories)
+                                                   .ToListAsync();
             return View(contacts);
         }
 
@@ -63,10 +66,16 @@ namespace ContactProKev_MVC.Controllers
 
         // GET: Contacts/Create --------------getting enum list**
         [Authorize]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
             //TODO: Categories Drop Down
+            string userID = _userManager.GetUserId(User);
+            List<Category> categories = await _context.Categories
+                                                      .Where(c => c.AppUserID == userID)
+                                                      .ToListAsync();
+            ViewData["CategoryList"] = new MultiSelectList(categories,"Id","Name");
+
             return View();
         }
 
@@ -76,7 +85,7 @@ namespace ContactProKev_MVC.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,ImageFile")] Contact contact)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,ImageFile")] Contact contact, List<int> categoryList)
         {
             ModelState.Remove("AppUserId");
             
@@ -101,9 +110,25 @@ namespace ContactProKev_MVC.Controllers
 
                 _context.Add(contact);
                 await _context.SaveChangesAsync();
+
+                //TODO: Use the list of category Ids to...
+                //1. Find the associated Category
+                //2. Add the Category to the Collection of Categories for the current Contact
+                foreach(int categoryId in categoryList)
+                {
+                    await _addressBookService.AddContactToCategoryAsync(categoryId,contact.Id);
+                }
+
+
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
+            string userID = _userManager.GetUserId(User);
+            List<Category> categories = await _context.Categories
+                                                      .Where(c => c.AppUserID == userID)
+                                                      .ToListAsync();
+            ViewData["CategoryList"] = new MultiSelectList(categories, "Id", "Name");
 
             return View(contact);
         }
@@ -116,12 +141,16 @@ namespace ContactProKev_MVC.Controllers
                 return NotFound();
             }
 
-            var contact = await _context.Contacts.FindAsync(id);
+            Contact? contact = await _context.Contacts.FindAsync(id);
+
             if (contact == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", contact.AppUserId);
+
+            ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
+            //TODO: Add a categories List
+
             return View(contact);
         }
 
@@ -130,7 +159,7 @@ namespace ContactProKev_MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,Created,ImageData,ImageType")] Contact contact)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,Created,ImageFile,ImageData,ImageType")] Contact contact)
         {
             if (id != contact.Id)
             {
@@ -141,8 +170,28 @@ namespace ContactProKev_MVC.Controllers
             {
                 try
                 {
+                    contact.Created = DateTime.SpecifyKind(contact.Created, DateTimeKind.Utc);
+
+                    if (contact.BirthDate != null)
+                    {
+                        contact.BirthDate = DateTime.SpecifyKind(contact.BirthDate.Value, DateTimeKind.Utc);
+                    }
+
+                    //Check whether a file/image has been selected
+                    //if ImageFile is NOT null set the ImageData property - Convert file to byte[]
+                    //if ImageFile is NOT null set the ImageType property - Use the file extension as the value
+                    if (contact.ImageFile != null)
+                    {
+                        contact.ImageData = await _imageService.ConvertFileToByteArrayAsync(contact.ImageFile);
+                        contact.ImageType = contact.ImageFile.ContentType;
+                    }
+
+
                     _context.Update(contact);
                     await _context.SaveChangesAsync();
+
+                    //TODO: ADD categories Code
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
