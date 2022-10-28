@@ -4,7 +4,7 @@ namespace ContactProKev_MVC.Services
 {
     public class ImageService : IImageService
     {
-        private readonly string defaultImage = "img/superdog200bg.jpg";
+        private readonly string defaultImage = "/img/superdog200bg.jpg";
 
 
         public string ConvertByteArrayToFile(byte[] fileData, string extension)

@@ -11,7 +11,147 @@
 
 <h1>Index</h1>
 
-<p>
+<div class="row">
+    <div class="col-12 text-end mb-2">
+        <a class="btn btn-primary rounded-pill" asp-action="Create" asp-controller="Contacts">Create New</a>
+    </div>
+</div>
+<div class="row g-2">
+    <div class="col-12 col-md-4 sideNav">
+        <form>
+            <div class="input-group">
+                <input class="form-control" type="search" name="searchString"
+                       placeholder="Search Term" />
+                <input type="submit" class="btn btn-outline-primary" value="Search" />
+            </div>
+        </form>
+        <form>
+            <div class="mt-5">
+                <label class="form-label fw-bold">CATEGORY FILTER</label>
+                <select name="id" asp-items="@ViewBag.CategoryId" class="form-control"
+                        onchange="this.form.submit()" onfocus="this.selectedIndex=-1;this.blur();">
+                    <option>All Contacts</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <div class="col-12 col-md-8">
+        <div class="row row-cols-1 g-3">
+            @foreach(Contact contact in Model)
+            {            
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4 square-img-container">
+                            <img src="@ImageService.ConvertByteArrayToFile(contact.ImageData!, contact.ImageType!)" class="square-img rounded-start" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">@contact.FullName</h5>
+                                <address class="card-text">
+                                    @contact.Address1<br>
+                                    @contact.Address2<br>
+                                    @contact.City, @contact.State @contact.ZipCode
+                                </address>
+                                <div class="card-text">
+                                    <span class="fw-bold me-2">Phone:</span>@contact.PhoneNumber
+                                </div>
+                                <div class="card-text">
+                                    <span class="fw-bold me-2">Email:</span>@contact.Email
+                                </div>
+                                <div class="fs-4">
+                                    <a class="me-3 editIcons" asp-action="Edit" asp-route-id="@contact.Id"><i class="bi bi-pencil-fill "></i></a>
+                                    <a class="me-3 editIcons" href="/ContactEmail.html"><i class="bi bi-envelope-fill "></i></a>
+                                    <a class="me-3 editIcons" asp-action="Delete"asp-route-id="@contact.Id"><i class="bi bi-trash-fill text-danger "></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+           
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@*<div class="col">
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4 square-img-container">
+                <img src="/img/GinaTorres.png" class="square-img rounded-start" alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">Gina Torres</h5>
+                    <address class="card-text">
+                        123 N Main Street<br>
+                        Kenersville, NC 27284
+                    </address>
+                    <div class="card-text">
+                        <span class="fw-bold me-2">Phone:</span>336.555.1234
+                    </div>
+                    <div class="card-text">
+                        <span class="fw-bold me-2">Email:</span>Gina@email.com
+                    </div>
+                    <div class="fs-4">
+                        <a class="me-3 editIcons" href="/contacctdetail.html"><i class="bi bi-pencil-fill "></i></a>
+                        <a class="me-3 editIcons" href="/ContactEmail.html"><i class="bi bi-envelope-fill "></i></a>
+                        <a class="me-3 editIcons"><i class="bi bi-trash-fill text-danger "></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col">
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4 square-img-container">
+                <img src="/img/ClaudiaBlack.png" class="square-img rounded-start" alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">Claudia Black</h5>
+                    <address class="card-text">
+                        123 N Main Street<br>
+                        Kenersville, NC 27284
+                    </address>
+                    <div class="card-text">
+                        <span class="fw-bold me-2">Phone:</span>336.555.1234
+                    </div>
+                    <div class="card-text">
+                        <span class="fw-bold me-2">Email:</span>claudia@email.com
+                    </div>
+                    <div class="fs-4">
+                        <a class="me-3 editIcons" href="/contacctdetail.html"><i class="bi bi-pencil-fill "></i></a>
+                        <a class="me-3 editIcons" href="/ContactEmail.html"><i class="bi bi-envelope-fill "></i></a>
+                        <a class="me-3 editIcons"><i class="bi bi-trash-fill text-danger "></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+*@
+
+
+
+
+
+
+
+
+
+
+
+
+@*<p>
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
@@ -112,3 +252,4 @@
 }
     </tbody>
 </table>
+*@

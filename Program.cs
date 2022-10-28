@@ -2,7 +2,7 @@ using ContactProKev_MVC.Data;
 using ContactProKev_MVC.Models;
 using ContactProKev_MVC.Services;
 using ContactProKev_MVC.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,9 +21,9 @@ builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireCo
 // Custom Serviceswhat i have added
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IAddressBookService, AddressBookService>();
+builder.Services.AddScoped<IEmailSender, EmailService>() ;
 
-
-
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 
 builder.Services.AddMvc();

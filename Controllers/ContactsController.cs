@@ -20,6 +20,8 @@ namespace ContactProKev_MVC.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IImageService _imageService;
         private readonly IAddressBookService _addressBookService;
+        
+
         public ContactsController(ApplicationDbContext context, 
             UserManager<AppUser> userManager,
             IImageService imageService,
@@ -42,6 +44,10 @@ namespace ContactProKev_MVC.Controllers
                                                    .Include(c => c.AppUser)
                                                    .Include(c => c.Categories)
                                                    .ToListAsync();
+
+            List<Category> userCategories = await _context.Categories.Where(c => c.AppUserID == userId).ToListAsync();
+
+            ViewData["CategoryId"] = new SelectList(userCategories, "Id", "Name");
             return View(contacts);
         }
 
@@ -141,8 +147,12 @@ namespace ContactProKev_MVC.Controllers
                 return NotFound();
             }
 
-            Contact? contact = await _context.Contacts.FindAsync(id);
-
+            string appUserId = _userManager.GetUserId(User);
+            
+            Contact? contact = await _context.Contacts
+                                             .Where(c => c.Id == id && c.AppUserId == appUserId)
+                                             .Include(c => c.Categories)
+                                             .FirstOrDefaultAsync();
             if (contact == null)
             {
                 return NotFound();
@@ -150,6 +160,11 @@ namespace ContactProKev_MVC.Controllers
 
             ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
             //TODO: Add a categories List
+
+            List<Category> categories = (await _addressBookService.GetAppUserCategoriesAsync(appUserId)).ToList();
+            List<int> categoryIds = contact.Categories.Select(c=>c.Id).ToList();       
+            
+            ViewData["CategoryList"] = new MultiSelectList(categories, "Id", "Name", categoryIds);
 
             return View(contact);
         }
@@ -159,7 +174,7 @@ namespace ContactProKev_MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,Created,ImageFile,ImageData,ImageType")] Contact contact)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,FirstName,LastName,BirthDate,Address1,Address2,City,State,ZipCode,Email,PhoneNumber,Created,ImageFile,ImageData,ImageType")] Contact contact, List<int> categoryList)
         {
             if (id != contact.Id)
             {
@@ -191,6 +206,12 @@ namespace ContactProKev_MVC.Controllers
                     await _context.SaveChangesAsync();
 
                     //TODO: ADD categories Code
+                    //Remove currecnt categories
+                    await _addressBookService.RemoveAllContactCategoriesAsync(contact.Id);
+
+                    //Add Selected categories to the contacts
+                    await _addressBookService.AddContactToCategoiesAsync(categoryList, contact.Id);
+
 
                 }
                 catch (DbUpdateConcurrencyException)
@@ -207,7 +228,17 @@ namespace ContactProKev_MVC.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", contact.AppUserId);
-            return View(contact);
+
+            ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
+            
+
+            List<Category> categories = (await _addressBookService.GetAppUserCategoriesAsync(contact.AppUserId!)).ToList();
+            List<int> categoryIds = contact.Categories.Select(c => c.Id).ToList();
+
+            ViewData["CategoryList"] = new MultiSelectList(categories, "Id", "Name", categoryIds);
+
+            return View(contact);                     
+
         }
 
         // GET: Contacts/Delete/5

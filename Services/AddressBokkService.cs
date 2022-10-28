@@ -14,6 +14,34 @@ namespace ContactProKev_MVC.Services
             _context = context;
         }
 
+        public async Task AddContactToCategoiesAsync(IEnumerable<int> categoryIds, int contactId)
+        {
+            try
+            {
+                Contact? contact = await _context.Contacts.FindAsync(contactId);
+
+                foreach(int categoryId in categoryIds)
+                {
+                    Category? category = await _context.Categories.FindAsync(categoryId);
+
+                    if (contact != null && category != null)
+                    {
+                        //category.Contacts.Add(contact);
+
+                        contact.Categories.Add(category);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task AddContactToCategoryAsync(int categoryId, int contactId)
         {
             try
@@ -40,6 +68,24 @@ namespace ContactProKev_MVC.Services
             }
         }
 
+        public async Task<IEnumerable<Category>> GetAppUserCategoriesAsync(string appUserId)
+        {
+            List<Category> categories = new List<Category>();
+            try
+            {
+                categories = await _context.Categories.Where(c=>c.AppUserID==appUserId)
+                                                      .OrderBy(c=>c.Name)
+                                                      .ToListAsync();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+          return categories;
+        }
+
         public async Task<bool> IsContactInCategory(int categoryId, int contactId)
         {
             Contact? contact = await _context.Contacts.FindAsync(contactId);
@@ -50,6 +96,26 @@ namespace ContactProKev_MVC.Services
                                         .AnyAsync();
 
             return isinCategory;
+        }
+
+        public async Task RemoveAllContactCategoriesAsync(int contactId)
+        {
+            try
+            {
+                Contact? contact = await _context.Contacts
+                                                 .Include(c=>c.Categories)
+                                                 .FirstOrDefaultAsync(c=> c.Id == contactId);
+                
+                contact!.Categories.Clear();
+                _context.Update(contact);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }
