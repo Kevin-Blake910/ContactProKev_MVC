@@ -37,14 +37,16 @@ namespace ContactProKev_MVC.Data
 
         public static async Task ManageDataAsync(IServiceProvider svcProvider)
         {
+            //obtain the necessary services based on the IServicePovider parameter 
             var dbContextSvc = svcProvider.GetRequiredService<ApplicationDbContext>();
 
             var userManagerSvc = svcProvider.GetRequiredService<UserManager<AppUser>>();
 
+            //Align the database by checking Migrations
             await dbContextSvc.Database.MigrateAsync();
 
             // Seed Demo User
-
+            await SeedDemoUserAsync(userManagerSvc);
 
         }
 
