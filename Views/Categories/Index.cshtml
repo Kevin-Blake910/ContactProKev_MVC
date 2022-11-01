@@ -30,7 +30,7 @@
                     </td>
                     <td class="d-flex justify-content-end">
                         <a class="me-3 editIcons" asp-action="Edit" asp-route-id="@category.Id"><i class="bi bi-pencil-fill"></i></a>
-                        <a class="me-3 editIcons" href="#"><i class="bi bi-envelope-fill"></i></a>
+                            <a class="me-3 editIcons" asp-action="EmailCategory" asp-route-id="@category.Id"><i class="bi bi-envelope-fill"></i></a>
                             <a class="editIcons text-danger" asp-action="Delete" asp-route-id="@category.Id"><i class="bi bi-trash-fill "></i></a>
                     </td>
                 </tr> 
@@ -41,6 +41,28 @@
 </div>
 
 
+@section scripts{
+<script>
+    let message = '@(ViewBag.SwalMessage)';
+
+    if (!message.includes("Error") && message != ''){
+        Swal.fire({
+            backdrop:false,
+            icon: 'success',
+            title: message,
+            showConfirmutton: true
+        }) 
+    }else if(message.includes("Error"))   {
+            Swal.fire({
+                backdrop: false,
+                icon:'error',
+                title: 'Opps',
+                text: message
+            })
+        }
+    
+</script>
+}
 
 @*<p>
     <a asp-action="Create">Create New</a>

@@ -18,17 +18,18 @@
 </div>
 <div class="row g-2">
     <div class="col-12 col-md-4 sideNav">
-        <form>
+        <form asp-action="SearchContacts" asp-controller="Contacts" method="post">
             <div class="input-group">
                 <input class="form-control" type="search" name="searchString"
                        placeholder="Search Term" />
                 <input type="submit" class="btn btn-outline-primary" value="Search" />
             </div>
         </form>
-        <form>
+        <form asp-action="Index" asp-controller="Contacts" method="post">
             <div class="mt-5">
                 <label class="form-label fw-bold">CATEGORY FILTER</label>
-                <select name="id" asp-items="@ViewBag.CategoryId" class="form-control"
+             
+                <select name="categoryId" asp-items="@ViewBag.CategoryId" class="form-control"
                         onchange="this.form.submit()" onfocus="this.selectedIndex=-1;this.blur();">
                     <option>All Contacts</option>
                 </select>
@@ -75,181 +76,28 @@
     </div>
 </div>
 
+@section scripts{
+    <script>
+        let message = '@(ViewBag.SwalMessage)';
 
+        if (!message.includes("Error") && message != '') {
+            Swal.fire({
+                backdrop: false,
+                icon: 'success',
+                title: message,
+                showConfirmutton: true
+            })
+        } else if (message.includes("Error")) {
+            Swal.fire({
+                backdrop: false,
+                icon: 'error',
+                title: 'Opps',
+                text: message
+            })
+        }
 
-
-
-@*<div class="col">
-    <div class="card mb-3">
-        <div class="row g-0">
-            <div class="col-md-4 square-img-container">
-                <img src="/img/GinaTorres.png" class="square-img rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title">Gina Torres</h5>
-                    <address class="card-text">
-                        123 N Main Street<br>
-                        Kenersville, NC 27284
-                    </address>
-                    <div class="card-text">
-                        <span class="fw-bold me-2">Phone:</span>336.555.1234
-                    </div>
-                    <div class="card-text">
-                        <span class="fw-bold me-2">Email:</span>Gina@email.com
-                    </div>
-                    <div class="fs-4">
-                        <a class="me-3 editIcons" href="/contacctdetail.html"><i class="bi bi-pencil-fill "></i></a>
-                        <a class="me-3 editIcons" href="/ContactEmail.html"><i class="bi bi-envelope-fill "></i></a>
-                        <a class="me-3 editIcons"><i class="bi bi-trash-fill text-danger "></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="col">
-    <div class="card mb-3">
-        <div class="row g-0">
-            <div class="col-md-4 square-img-container">
-                <img src="/img/ClaudiaBlack.png" class="square-img rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title">Claudia Black</h5>
-                    <address class="card-text">
-                        123 N Main Street<br>
-                        Kenersville, NC 27284
-                    </address>
-                    <div class="card-text">
-                        <span class="fw-bold me-2">Phone:</span>336.555.1234
-                    </div>
-                    <div class="card-text">
-                        <span class="fw-bold me-2">Email:</span>claudia@email.com
-                    </div>
-                    <div class="fs-4">
-                        <a class="me-3 editIcons" href="/contacctdetail.html"><i class="bi bi-pencil-fill "></i></a>
-                        <a class="me-3 editIcons" href="/ContactEmail.html"><i class="bi bi-envelope-fill "></i></a>
-                        <a class="me-3 editIcons"><i class="bi bi-trash-fill text-danger "></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-*@
-
-
-
-
-
-
-
-
-
-
-
-
-@*<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BirthDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address1)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address2)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.City)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.State)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ZipCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhoneNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Created)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageData)
-            </th>            
-            <th>
-                Categories
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BirthDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address1)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address2)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.City)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.State)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ZipCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Created)
-            </td>
-            <td>
-                <img src="@ImageService.ConvertByteArrayToFile(item.ImageData!,item.ImageType!)" style="width:80%;height:80%" />
-            </td>         
-            <td>
-                @foreach(Category category in item.Categories){
-                    <p>@category.Name</p>
-                }
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    </script>
 }
-    </tbody>
-</table>
-*@
+
+
+

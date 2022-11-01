@@ -31,7 +31,7 @@
           <div class="col-12 col-lg-6 ">
             <label asp-for="FirstName" class="form-label">First Name</label>
             <input asp-for="FirstName" type="text" class="form-control">
-            <span asp-validation-for="FirstName" class="text-danget"></span>
+            <span asp-validation-for="FirstName" class="text-danger"></span>
           </div>
           <div class="col-12 col-lg-6">
             <label asp-for="LastName" class="form-label">Last Name</label>
@@ -41,27 +41,27 @@
           <div class="col-12 col-lg-6 mt-2">
             <label asp-for="Email" class="form-label">Email</label>
             <input asp-for="Email"type="email" class="form-control">
-            <span asp-validation-for="Email" class="text-danget"></span>
+            <span asp-validation-for="Email" class="text-danger"></span>
           </div>
           <div class="col-12 col-lg-6 mt-2">
             <label asp-for="PhoneNumber" class="form-label">Phone</label>
             <input asp-for="PhoneNumber" type="tel" class="form-control">
-            <span asp-validation-for="PhoneNumber" class="text-danget"></span>
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
           </div>
           <div class="col-12 mt-2">
             <label asp-for="Address1" class="form-label">Address</label>
             <input asp-for="Address1" type="text" class="form-control">
-            <span asp-validation-for="Address1" class="text-danget"></span>
+            <span asp-validation-for="Address1" class="text-danger"></span>
           </div>
           <div class="col-12 mt-2">
             <label asp-for="Address2" class="form-label">Address 2</label>
             <input asp-for="Address2"type="text" class="form-control">
-            <span asp-validation-for="Address2" class="text-danget"></span>
+            <span asp-validation-for="Address2" class="text-danger"></span>
           </div>
           <div class="col-12 col-lg-6 mt-2">
             <label asp-for="City" class="form-label">City</label>
             <input asp-for="City" type="text" class="form-control">
-            <span asp-validation-for="City" class="text-danget"></span>
+            <span asp-validation-for="City" class="text-danger"></span>
           </div>
 
           <div class="col-12 col-lg-4 mt-2">
@@ -72,18 +72,16 @@
             <label asp-for="ZipCode" class="form-label">Zip</label>
             <input asp-for="ZipCode" type="text" class="form-control">
           </div>
-          <span asp-validation-for="ZipCode" class="text-danget"></span>
+          <span asp-validation-for="ZipCode" class="text-danger"></span>
                     <div class="col-12 col-lg-6 mt-3">
                         <label asp-for="Categories" class="control-label">Categories</label>
-                        <select asp-items="ViewBag.CategoryList" name="CategorlList" class="form-select" multiple>
-
-                            <!--think im missing something^^-->
+                        <select asp-items="ViewBag.CategoryList" name="CategoryList" class="form-select" multiple>                           
                         </select>
                     </div>
           <div class="col-12 col-lg-6 mt-3">
             <label asp-for="BirthDate" class="control-label">Birth Date</label>
             <input asp-for="BirthDate" type="date" class="form-control" >
-            <span asp-validation-for="BirthDate" class="text-danget"></span>
+            <span asp-validation-for="BirthDate" class="text-danger"></span>
 
           </div>
           <div class="col-12 d-flex justify-content-end mt-2">
@@ -98,6 +96,17 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+
+
+
+
+
+
+
+
+
 
 
 @*<h1>Edit</h1>

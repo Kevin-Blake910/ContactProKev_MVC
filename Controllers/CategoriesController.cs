@@ -5,6 +5,7 @@ using ContactProKev_MVC.Data;
 using ContactProKev_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace ContactProKev_MVC.Controllers
 {
@@ -14,19 +15,23 @@ namespace ContactProKev_MVC.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
-
+        private readonly IEmailSender _emailSender;
 
         public CategoriesController(ApplicationDbContext context,
-                                    UserManager<AppUser> userManager)
+                                    UserManager<AppUser> userManager,
+                                    IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         // GET: Categories
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? swalMessage = null)
         {
+            ViewData["SwalMessage"] = swalMessage;
+
             string userID = _userManager.GetUserId(User);
 
             List<Category> categories = await _context.Categories
@@ -61,7 +66,61 @@ namespace ContactProKev_MVC.Controllers
         {
            
             return View();
+        }      
+
+        //EmailCategory
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> EmailCategory(int? id)
+        {
+            string appUserId = _userManager.GetUserId(User);
+            Category? category = await _context.Categories
+                                               .Include(c=> c.Contacts)                               
+                                               .FirstOrDefaultAsync(c => c.Id == id && c.AppUserID == appUserId);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            List<string> emails = category!.Contacts.Select(c => c.Email).ToList()!;
+            //Delimiter ;
+            EmailData emailData = new EmailData()
+            {
+                GroupName = category.Name,
+                EmailAddress = string.Join(";", emails),
+                EmailSubject = $"Group Message: {category.Name}"
+            };
+
+            return View(emailData);
         }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EmailCategory(EmailData emailData)
+        {
+            if (ModelState.IsValid)
+            {
+                string swalMessage = string.Empty;
+
+                try
+                {
+                    await _emailSender.SendEmailAsync(emailData!.EmailAddress, emailData.EmailSubject, emailData.EmailBody);
+                    swalMessage = "Success: Email Sent";
+                    return RedirectToAction("Index", "Categories", new { swalMessage });
+
+                }
+                catch (Exception)
+                {
+                    swalMessage = "Error: Email Send Failed";
+                    return RedirectToAction("Index", "Categories", new { swalMessage });
+                    throw;
+                }
+            }
+            return View(emailData);
+        }
+
 
         // POST: Categories/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
