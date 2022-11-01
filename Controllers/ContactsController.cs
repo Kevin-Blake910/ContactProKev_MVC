@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using ContactProKev_MVC.Enums;
 using ContactProKev_MVC.Services.Interfaces;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace ContactProKev_MVC.Controllers
 {
@@ -20,17 +21,19 @@ namespace ContactProKev_MVC.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IImageService _imageService;
         private readonly IAddressBookService _addressBookService;
-        
+        private readonly IEmailSender _emailSender;
 
         public ContactsController(ApplicationDbContext context, 
             UserManager<AppUser> userManager,
             IImageService imageService,
-            IAddressBookService addressBookService)
+            IAddressBookService addressBookService,
+            IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
             _imageService = imageService;
             _addressBookService = addressBookService;
+            _emailSender = emailSender;
         }
 
         // GET: Contacts ----------------can do more then one include
@@ -49,6 +52,61 @@ namespace ContactProKev_MVC.Controllers
 
             ViewData["CategoryId"] = new SelectList(userCategories, "Id", "Name");
             return View(contacts);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> EmailContact(int? id)
+        {
+
+            string appUserId = _userManager.GetUserId(User);
+            Contact? contact = await _context.Contacts.FirstOrDefaultAsync(c => c.Id == id && c.AppUserId == appUserId);
+
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            EmailData emailData = new EmailData()
+            {
+                EmailAddress = contact.Email,
+                FirstName = contact.FirstName,
+                LastName = contact.LastName
+            };
+
+            EmailContactViewModels viewModels = new EmailContactViewModels()
+            {
+                Contact = contact,
+                EmailData = emailData
+            };
+
+            return View(viewModels);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EmailContact(EmailContactViewModels viewModels)
+        {
+            if (ModelState.IsValid)
+            {
+                string swalMessage = string.Empty;
+
+                try
+                {
+                    await _emailSender.SendEmailAsync(viewModels.EmailData!.EmailAddress, viewModels.EmailData.EmailSubject, viewModels.EmailData.EmailBody);
+                    swalMessage = "Success: Email Sent";
+                    return RedirectToAction("Index", "Contacts", new { swalMessage });
+
+                }
+                catch (Exception)
+                {
+                    swalMessage = "Error: Email Send Failed";
+                    return RedirectToAction("Index", "Contacts", new { swalMessage });
+                    throw;
+                }
+            }
+            return View();
         }
 
         // GET: Contacts/Details/5
