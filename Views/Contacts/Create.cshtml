@@ -5,7 +5,7 @@
 }
 
 
-<h1>EDIT CONTACT</h1>
+<h1>CREATE CONTACT</h1>
 <div class="p-3 border border-2 shadow-lg bg-light">
   <form asp-action="Create" method="post" asp-controller="Contacts" enctype="multipart/form-data">
     <div class="row g-3 p-2">
@@ -65,13 +65,13 @@
             <input asp-for="ZipCode" type="text" class="form-control">
           </div>
           <span asp-validation-for="ZipCode" class="text-danger"></span>
+         
           <div class="col-12 col-lg-6 mt-3">
             <label asp-for="Categories" class="control-label">Categories</label>
-            <select asp-items="ViewBag.CategoryList" name="CategoryList" class="form-select" multiple >
-              
-              <!--think im missing something^^-->
-            </select>
+            <select asp-items="ViewBag.CategoryList" name="CategoryList" class="form-select" multiple >     
+             </select>
           </div>
+        
           <div class="col-12 col-lg-6 mt-3">
             <label asp-for="BirthDate" class="control-label">Birth Date</label>
             <input asp-for="BirthDate" type="date" class="form-control" >
