@@ -23,7 +23,7 @@
         </div>
         <div>
           <label asp-for="ImageFile" class="control-label"></label>
-          <input  type="file" class="form-control" accept=".png,.jpg,.jpeg,.gif">
+                    <input asp-for="ImageFile" type="file" class="form-control" accept=".png,.jpg,.jpeg,.gif" onchange="document.getElementById('contactImage').src = window.URL.createObjectURL(this.file[0])"/>
         </div>
       </div>
       <div class="col-12 col-lg-8">

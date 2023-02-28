@@ -24,9 +24,9 @@ nav {
 
 
 
-html,
-body{
+html, body {
     height: 100%;
+    font-size: 14px;
 }
 
 
@@ -35,11 +35,12 @@ body{
 html {
     position: relative;
     min-height: 100%;
-    font-size: 14px;
+   
 }
 
 
 body {
+    margin-bottom: 60px;
     display: flex;
     flex-direction: column;
     font-family: var(--kb-body-font);    
@@ -52,8 +53,31 @@ footer {
     flex-shrink: 0;
     background-color: var(--kb-primary-color);
 }
+
+
+.footer-cta {
+    border-radius: 15px;
+    background: var(--kb-dark-color);
+    width: 100%;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.footer-main {
+    background: var(--kb-primary-color);
+    color: black;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
 .copyright{
-    font-size: .85rem;
+    font-size: 1.85rem;
+}
+
+.content {
+    flex: 1 0 auto;
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
 }
 
 /* Button OverRides!*/
